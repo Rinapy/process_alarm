@@ -7,7 +7,7 @@ ACCESS_TOKEN=$(grep 'ACCESS_TOKEN=' .env | cut -d'=' -f2)
 
 
 if pgrep -x "$PROCESS_NAME" > /dev/null; then
-    if [ ! -f /tmp/test_process_running ]; then
+    if [ ! -f /tmp/${PROCESS_NAME}_process_running ]; then
         echo "$(date): Процесс '$PROCESS_NAME' был запущен." >> "$LOG_FILE"
     fi
 
@@ -33,7 +33,7 @@ EOF
         echo "$(date): Сервер мониторинга недоступен, код ответа: $RESPONSE" >> "$LOG_FILE"
     fi
 else
-    if [ -f /tmp/test_process_running ]; then
+    if [ -f /tmp/${PROCESS_NAME}_process_running ]; then
         echo "$(date): Процесс '$PROCESS_NAME' остановлен." >> "$LOG_FILE"
         rm /tmp/test_process_running
     fi
