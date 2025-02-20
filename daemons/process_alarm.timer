@@ -1,0 +1,9 @@
+[Unit]
+Description=Запуск монитора каждую минуту
+
+[Timer]
+OnUnitActiveSec=1min
+Unit=process_alarm.service
+
+[Install]
+WantedBy=timers.target

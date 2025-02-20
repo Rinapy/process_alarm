@@ -1,0 +1,36 @@
+name: Deploy to Servers
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'deploy')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create .env file and execute commands on servers
+        env:
+          SERVERS: ${{ secrets.Servers_ip }}
+        run: |
+          IFS=',' read -ra ADDR <<< "$SERVERS"
+          for server in "${ADDR[@]}"; do
+            echo "Подключение к серверу $server"
+            sshpass -p "${{ secrets.PASSWORD }}" ssh -o StrictHostKeyChecking=no "${{ secrets.USER }}"@$server << 'EOF'
+              echo "PROCESS_NAME={{ variables.PROCESS_NAME }}" > .env
+              echo "API_URL={{ variables.API_URL }}" >> .env
+              echo "LOG_FILE=/var/log/monitoring.log" >> .env
+              echo "ACCESS_TOKEN={{ variables.ACCESS_TOKEN }}" >> .env
+              sudo cp process_alarm.sh /usr/bin/
+              sudo cp process_alarm.service /etc/systemd/system/
+              sudo cp process_alarm.timer /etc/systemd/system/
+              sudo systemctl daemon-reload
+              sudo systemctl enable process_alarm.timer
+              sudo systemctl start process_alarm.timer
+            EOF
+          done
+
