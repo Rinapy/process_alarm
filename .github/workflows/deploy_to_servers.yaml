@@ -25,6 +25,7 @@ jobs:
               echo "API_URL={{ variables.API_URL }}" >> .env
               echo "LOG_FILE=/var/log/monitoring.log" >> .env
               echo "ACCESS_TOKEN={{ variables.ACCESS_TOKEN }}" >> .env
+              sudo chmod +x process_alarm.sh
               sudo cp process_alarm.sh /usr/bin/
               sudo cp process_alarm.service /etc/systemd/system/
               sudo cp process_alarm.timer /etc/systemd/system/
